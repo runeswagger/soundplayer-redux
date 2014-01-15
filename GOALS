@@ -1,0 +1,23 @@
+
+Development Goals:
+	Decoder Modules:
+		*_init(struct sp* env)
+			-this should initialize the codec
+			-it should bundle it's assets in env->private_data
+			-the convention for this is a struct fmtname_data
+			-if the struct would only contain one member than the struct can be omitted and the api's native handle assigned to env->private_data.
+			-it should return 0 on success
+			-it should return a standardized negative value to signify a specific ERROR
+		*_play(struct sp* env)
+			-this function is expected to handle all values of env->size
+			-it's not required to NULL check input currently but perhaps it should
+			-this function should return the number of bytes used from the input on success
+			-this function should not modify env->size or env->input directly
+			-error return values are iffy at this point, since input may be consumed whether or not
+				an error occurs, an error reporting member of struct sp may be required
+			-standardized negative return values will therefore be the current convention
+		*_deinit(struct sp* env)
+			-this function destroys all non-automatic assests of the codec if possible
+			-it is expected to operate without serious error and return 0
+		struct fmtname_data{}
+			-this should be allocated on the heap during initialization not declared as static
