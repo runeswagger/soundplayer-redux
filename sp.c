@@ -22,6 +22,11 @@ int arg_parse(int, char**);
 int err();
 enum type fmt;
 
+void progress(long cur, long end){
+	printf("%li/%li\r",cur,end);
+	fflush(stdout);
+}
+
 int main(int argc, char **argv) {
 	if(argc < 2) return -1;
 
@@ -44,7 +49,8 @@ int main(int argc, char **argv) {
 	
 	struct stat fileinfo;
 	fstat(fd, &fileinfo);
-	soundp.input = mmap(NULL, fileinfo.st_size, PROT_READ, MAP_PRIVATE, fd, 0 );
+	//map file, and round up to the next page boundary
+	soundp.input = mmap(NULL, ((fileinfo.st_size/4096+1)*4096), PROT_READ, MAP_PRIVATE, fd, 0 );
 	soundp.size = fileinfo.st_size;
 
 	int (*play[LEN_MODULES][NUM_FUNC])(struct sp *arg) = {
@@ -66,7 +72,7 @@ int main(int argc, char **argv) {
 		if(play[soundp.format][INIT](&soundp)) goto END;
 		soundp.input += soundp.p.offset; //if struct sp is used uninitialized this could be a problem
 		do { //play song
-			if(fileinfo.st_size - curindex > 4096){
+			if((fileinfo.st_size - curindex) > 4096){
 				soundp.size = 4096;
 			}
 			else{
@@ -75,6 +81,7 @@ int main(int argc, char **argv) {
 			bytes_consumed = play[soundp.format][PLAY](&soundp);
 			soundp.input += bytes_consumed;
 			curindex += bytes_consumed;
+			progress(curindex, fileinfo.st_size);
 		} while(curindex < fileinfo.st_size);
 		play[soundp.format][DEINIT](&soundp);
 		
@@ -147,7 +154,7 @@ void detect_filetype_from_filename(char* filename){
 	file_ext >>= 8; //we now have the extension
 	file_ext |= *(int*)("    "); //ORing 4 spaces converts to lower with minimal punctuation loss
 	
-	for(i = 0; i < 6; i++){
+	for(i = 0; i < 7; i++){
 		//search all fileextensions
 		if(file_ext == ext[i]) {
 			fmt = i;

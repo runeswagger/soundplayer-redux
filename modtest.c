@@ -5,9 +5,10 @@
 
 //standard includes
 #include <stdio.h>
+#include <string.h>
 
 //configure soundplayer environment
-#define USE_SPEEX
+#define USE_OGG
 #define USE_OUTPUT_ALSA
 
 //includes for soundplayer
@@ -16,14 +17,14 @@
 #include "includes/decoders.h"
 #include "includes/outputs.h"
 
-#define BUF_SIZE 4096
+#define BUF_SIZE 32768
 
 struct sp soundp;
 
 //OMG! this actually works
-int (*init)(struct sp*) = speex_init;
-int (*play)(struct sp*) = speex_play;
-int (*deinit)(struct sp*) = speex_deinit;
+int (*init)(struct sp*) = ogg_init;
+int (*play)(struct sp*) = ogg_play;
+int (*deinit)(struct sp*) = ogg_deinit;
 
 //we always use the alsa module
 struct cb callback = {
@@ -53,7 +54,7 @@ int main(int argc, char* argv[]){
 		return -1;
 	}
 
-	memset(soundp, 0, sizeof(struct sp)); //initialize soundp
+	memset(&soundp, 0, sizeof(struct sp)); //initialize soundp
 	FILE* input = fopen(argv[1], "r"); //open input for reading
 
 	if(input == NULL){ //can't open input
