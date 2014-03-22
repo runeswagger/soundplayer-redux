@@ -18,8 +18,8 @@ SRC += codecs/wav.c
 #LIBS += -lfaad
 
 #mp3 decoder
-#SRC += codecs/mp3.c
-#LIBS += -lmp3lame
+SRC += codecs/mp3.c
+LIBS += -lmp3lame
 
 #ogg decoder
 #SRC += codecs/ogg.c

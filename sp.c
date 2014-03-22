@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 	int (*handlers[LEN_MODULES])(struct sp *arg, enum sp_ops operation) = {
 		[WAV] = wav,
 		//[AAC] = {aac_init,aac_play,aac_deinit},
-		//[MP3] = {mp3_init,mp3_play,mp3_deinit},
+		[MP3] = mp3,
 		//[OGG] = {ogg_init,ogg_play,ogg_deinit},
 		//[FLAC] = {err,err,err},
 		//[SPC] = {spc_init,spc_play_sp,spc_deinit},
