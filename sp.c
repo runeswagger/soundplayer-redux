@@ -28,8 +28,8 @@ void progress(long cur, long end){
 int main(int argc, char **argv) {
 	if(argc < 2) return -1;
 
-	struct sp soundp = { 0 }; //gcc will fill in the rest of the 0
-	struct sp callback;
+	struct sp callback = { .dispatcher = alsa, .data = "default" }; //we have an alsa callback
+	struct sp soundp = { .next = &callback }; //create the link
 
 	arg_parse(argc, argv);
 
@@ -52,23 +52,23 @@ int main(int argc, char **argv) {
 	soundp.input = mmap(NULL, ((fileinfo.st_size/4096+1)*4096), PROT_READ, MAP_PRIVATE, fd, 0 );
 	soundp.size = fileinfo.st_size;
 
-	int (*play[LEN_MODULES][NUM_FUNC])(struct sp *arg) = {
-		[WAV] = {wav_init,wav_play,wav_deinit},
+	int (*handlers[LEN_MODULES])(struct sp *arg, enum sp_ops operation) = {
+		[WAV] = wav,
 		//[AAC] = {aac_init,aac_play,aac_deinit},
 		//[MP3] = {mp3_init,mp3_play,mp3_deinit},
 		//[OGG] = {ogg_init,ogg_play,ogg_deinit},
 		//[FLAC] = {err,err,err},
 		//[SPC] = {spc_init,spc_play_sp,spc_deinit},
 		//[TXT] = {tts_init,tts_play,tts_deinit},
-		[UNIMPLEMENTED] = {err,err,err}
+		[UNIMPLEMENTED] = err
 	};
 
 	int curindex = 0;
 	int bytes_consumed = 0;
 	{
-		callback.audio_init(NULL);
+		callback.dispatcher(&callback, SPOP_INIT);
 
-		if(play[soundp.format][INIT](&soundp)) goto END;
+		if(handlers[soundp.format](&soundp, SPOP_INIT)) goto END;
 		soundp.input += soundp.p.offset; //if struct sp is used uninitialized this could be a problem
 		do { //play song
 			if((fileinfo.st_size - curindex) > 4096){
@@ -77,16 +77,16 @@ int main(int argc, char **argv) {
 			else{
 				soundp.size = fileinfo.st_size - curindex;
 			}
-			bytes_consumed = play[soundp.format][PLAY](&soundp);
+			bytes_consumed = handlers[soundp.format](&soundp, SPOP_DECODE);
 			soundp.input += bytes_consumed;
 			curindex += bytes_consumed;
 			progress(curindex, fileinfo.st_size);
 		} while(curindex < fileinfo.st_size);
-		play[soundp.format][DEINIT](&soundp);
+		handlers[soundp.format](&soundp, SPOP_DEINIT);
 
 		//cleanup
 		END:
-		callback.audio_deinit();
+		callback.dispatcher(&callback, SPOP_DEINIT);
 	}
 
 	//exit
@@ -96,10 +96,6 @@ int main(int argc, char **argv) {
 
 int arg_parse(int argc, char **argv) {
 	fmt = UNIMPLEMENTED; //initialize value
-	callback.audio_init = output_alsa_init;
-	callback.audio_play = output_alsa_play;
-	callback.audio_deinit = output_alsa_deinit;
-	callback.audio_configure = output_alsa_configure;
 
 	int parse = 0;
 	while((parse = getopt(argc, argv, "f:o:")) != -1){

@@ -2,17 +2,18 @@
 #include "../includes/common.h"
 
 struct alsa_data {
-	snd_pcm_t pcm; //the playback handle
+	snd_pcm_t* pcm; //the playback handle
 };
 
 int alsa_configure(struct sp * env){
 	struct alsa_data* data = (struct alsa_data*) env->data;
-	snd_pcm_set_params(data->pcm, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, env->p.chan, env->p.rate, 1, 500000);
+	snd_pcm_set_params(data->pcm, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, /*env->p.chan, env->p.rate,*/2,44100, 1, 500000);
 	return SP_OK;
 }
 
 int alsa_init(struct sp* env){
 	//initialize alsa
+	struct alsa_data* data = malloc(sizeof(struct alsa_data));
 	void* arg = env->data;
 	if(arg == NULL){
 		//the arg is a module specific initializer
@@ -25,8 +26,8 @@ int alsa_init(struct sp* env){
 	snd_pcm_open(&pcm,(char*)arg, SND_PCM_STREAM_PLAYBACK, 0);
 	if(pcm == NULL) return -1;
 
-
-	env->data = pcm;
+	data->pcm = pcm;
+	env->data = data;
 	env->p.rate = 44100;
 	env->p.chan = 2;
 	alsa_configure(env);
@@ -56,6 +57,7 @@ int alsa_deinit(struct sp* env){
 	struct alsa_data* data = (struct alsa_data*) env->data;
 	snd_pcm_drain(data->pcm);
 	snd_pcm_close(data->pcm);
+	free(env->data);
 	return SP_OK;
 }
 
@@ -72,5 +74,5 @@ int alsa(struct sp* env, enum sp_ops operation){
 		default:
 			return SP_NOCODE;
 	}
-	return SP_ERR;
+	return SP_ABORT;
 }

@@ -1,10 +1,5 @@
 #ifndef H_COMMON
 #define H_COMMON
-enum {
-	INIT,
-	PLAY,
-	DEINIT
-};
 
 enum sp_type {
 	WAV,
@@ -33,7 +28,7 @@ enum sp_ops {
 	SPOP_DECODE,
 	SPOP_INIT,
 	SPOP_DEINIT,
-	SPOP_DECODE,
+	SPOP_ENCODE,
 	SPOP_CONFIGURE
 };
 
@@ -53,7 +48,8 @@ struct sp {
 	enum sp_type format;
 	enum sp_state state;
 	struct param p;
-	int (*dispatcher)(struct sp* env, enum sp_operation);
+	struct sp* next;
+	int (*dispatcher)(struct sp* env, enum sp_ops operation);
 	int (*audio_configure)(int sample_rate, int channels, void* module_data);
 	int (*audio_init)(void* arg);
 	int (*audio_play)(char*,long);
