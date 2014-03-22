@@ -3,9 +3,9 @@ Development Goals:
 	Decoder Modules:
 		*_init(struct sp* env)
 			-this should initialize the codec
-			-it should bundle it's assets in env->private_data
+			-it should bundle it's assets in env->data
 			-the convention for this is a struct fmtname_data
-			-if the struct would only contain one member than the struct can be omitted and the api's native handle assigned to env->private_data.
+			-modules must place their data in a struct fmtname_data, even if it has only one member
 			-it should return 0 on success
 			-it should return a standardized negative value to signify a specific ERROR
 		*_play(struct sp* env)

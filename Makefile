@@ -7,7 +7,7 @@ SRC = sp.c
 #SRC += outputs/output-file.c
 
 #alsa output for sp2 (RECOMMENDED)
-SRC += outputs/output-alsa.c
+SRC += outputs/alsa.c
 LIBS += -lasound
 
 #wav decoder

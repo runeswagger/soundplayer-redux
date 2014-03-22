@@ -3,7 +3,7 @@
 #endif
 
 #ifdef USE_OUTPUT_ALSA
-#include "output-alsa.h"
+#include "alsa.h"
 #endif
 
 #ifdef USE_OUTPUT_OSS
