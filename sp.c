@@ -55,12 +55,12 @@ int main(int argc, char **argv) {
 
 	int (*play[LEN_MODULES][NUM_FUNC])(struct sp *arg) = {
 		[WAV] = {wav_init,wav_play,wav_deinit},
-		[AAC] = {aac_init,aac_play,aac_deinit},
-		[MP3] = {mp3_init,mp3_play,mp3_deinit},
-		[OGG] = {ogg_init,ogg_play,ogg_deinit},
-		[FLAC] = {err,err,err},
-		[SPC] = {spc_init,spc_play_sp,spc_deinit},
-		[TXT] = {tts_init,tts_play,tts_deinit},
+		//[AAC] = {aac_init,aac_play,aac_deinit},
+		//[MP3] = {mp3_init,mp3_play,mp3_deinit},
+		//[OGG] = {ogg_init,ogg_play,ogg_deinit},
+		//[FLAC] = {err,err,err},
+		//[SPC] = {spc_init,spc_play_sp,spc_deinit},
+		//[TXT] = {tts_init,tts_play,tts_deinit},
 		[UNIMPLEMENTED] = {err,err,err}
 	};
 
@@ -110,10 +110,10 @@ int arg_parse(int argc, char **argv) {
 				break;
 			case 'o':
 				//i don't have an easy way to select outputs yet. not outputs[][]
-				callback.audio_init = output_file_init;
-				callback.audio_play = output_file_play;
-				callback.audio_deinit = output_file_deinit;
-				callback.audio_configure = output_file_configure;
+			//	callback.audio_init = output_file_init;
+			//	callback.audio_play = output_file_play;
+			//	callback.audio_deinit = output_file_deinit;
+			//	callback.audio_configure = output_file_configure;
 				break;
 		}
 	}
