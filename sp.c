@@ -15,12 +15,10 @@
 #define BUF_SIZE 4096
 #define NUM_FUNC 3
 
-struct cb callback;
-
 void detect_filetype_from_filename(char* filename);
 int arg_parse(int, char**);
 int err();
-enum type fmt;
+enum sp_type fmt;
 
 void progress(long cur, long end){
 	printf("%li/%li\r",cur,end);
@@ -31,14 +29,15 @@ int main(int argc, char **argv) {
 	if(argc < 2) return -1;
 
 	struct sp soundp = { 0 }; //gcc will fill in the rest of the 0
-	
+	struct sp callback;
+
 	arg_parse(argc, argv);
 
 	if(fmt == UNIMPLEMENTED){
 		//user did not specify a -f
 		detect_filetype_from_filename(argv[argc-1]);
 	}
-	
+
 	soundp.format = fmt;
 
 	int fd = open(argv[argc-1], O_RDONLY);
@@ -46,7 +45,7 @@ int main(int argc, char **argv) {
 		perror("open");
 		return 1;
 	}
-	
+
 	struct stat fileinfo;
 	fstat(fd, &fileinfo);
 	//map file, and round up to the next page boundary
@@ -84,7 +83,7 @@ int main(int argc, char **argv) {
 			progress(curindex, fileinfo.st_size);
 		} while(curindex < fileinfo.st_size);
 		play[soundp.format][DEINIT](&soundp);
-		
+
 		//cleanup
 		END:
 		callback.audio_deinit();
@@ -117,7 +116,7 @@ int arg_parse(int argc, char **argv) {
 				break;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -140,7 +139,7 @@ void detect_filetype_from_filename(char* filename){
 	long file_ext;
 	int i = 0;
 	fmt = UNIMPLEMENTED;
-	
+
 	while(filename[i++]);
 	i -= 5; //position index on last 4 bytes
 	if(i < 0) return; //avoid accessing invalid memory
@@ -153,7 +152,7 @@ void detect_filetype_from_filename(char* filename){
 	}
 	file_ext >>= 8; //we now have the extension
 	file_ext |= *(int*)("    "); //ORing 4 spaces converts to lower with minimal punctuation loss
-	
+
 	for(i = 0; i < 7; i++){
 		//search all fileextensions
 		if(file_ext == ext[i]) {
