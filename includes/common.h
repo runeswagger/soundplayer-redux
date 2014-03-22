@@ -22,6 +22,7 @@ enum sp_err {
 	SP_OK = 0, 
 	SP_AGAIN = -1,
 	SP_ABORT = -2,
+	SP_NOCODE = -3
 };
 
 enum sp_state {
@@ -29,6 +30,11 @@ enum sp_state {
 };
 
 enum sp_ops {
+	SPOP_DECODE,
+	SPOP_INIT,
+	SPOP_DEINIT,
+	SPOP_DECODE,
+	SPOP_CONFIGURE
 };
 
 struct param {
