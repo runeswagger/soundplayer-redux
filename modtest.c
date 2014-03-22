@@ -1,6 +1,7 @@
 /* Module Test
  * single module/single output varient of soundplayer
  * designed to just drop in any module easily
+ * updated for the new soundplayer api
  */
 
 //standard includes
@@ -8,7 +9,7 @@
 #include <string.h>
 
 //configure soundplayer environment
-#define USE_OGG
+#define USE_WAV
 #define USE_OUTPUT_ALSA
 
 //includes for soundplayer
@@ -19,20 +20,13 @@
 
 #define BUF_SIZE 32768
 
-struct sp soundp;
+struct sp output = {
+	.dispatcher = alsa
+};
 
-//OMG! this actually works
-int (*init)(struct sp*) = ogg_init;
-int (*play)(struct sp*) = ogg_play;
-int (*deinit)(struct sp*) = ogg_deinit;
-
-//we always use the alsa module
-struct cb callback = {
-	.handle = NULL,
-	.audio_configure = output_alsa_configure,
-	.audio_init = output_alsa_init,
-	.audio_play = output_alsa_play,
-	.audio_deinit = output_alsa_deinit
+struct sp soundp = {
+	.dispatcher = wav,
+	.next = &output
 };
 
 int refill_buffer(FILE* input, unsigned char *b, int b_size, int bytes_remaining){
@@ -53,8 +47,7 @@ int main(int argc, char* argv[]){
 		printf("Usage:\n\t%s infile\n", argv[0]); //print help
 		return -1;
 	}
-
-	memset(&soundp, 0, sizeof(struct sp)); //initialize soundp
+	
 	FILE* input = fopen(argv[1], "r"); //open input for reading
 
 	if(input == NULL){ //can't open input
@@ -69,24 +62,24 @@ int main(int argc, char* argv[]){
 	//it's there so the program can distinguish multiple decoder instances
 	
 	//running our main loop
-	callback.audio_init(NULL);
+	output.dispatcher(&output, SPOP_INIT);
 
-	if(init(&soundp) == SP_ABORT) goto CLEANUP;
+	if(soundp.dispatcher(&soundp, SPOP_INIT) == SP_ABORT) goto CLEANUP;
 	//start seeking the input to an offset if necessary
 	fseek(input, soundp.p.offset, SEEK_SET);
 
 	soundp.size = fread(soundp.input, 1, BUF_SIZE, input); //read past offset into buffer
 	
 	do{
-		bytes_consumed = play(&soundp);
+		bytes_consumed = soundp.dispatcher(&soundp, SPOP_DECODE);
 		soundp.size = refill_buffer(input, soundp.input, BUF_SIZE, BUF_SIZE - bytes_consumed);
 	} while(soundp.size);
 
 	
-	deinit(&soundp);
+	soundp.dispatcher(&soundp, SPOP_DEINIT);
 
 	CLEANUP:
-	callback.audio_deinit();
+	output.dispatcher(&output, SPOP_DEINIT);
 
 	return 0;
 }
