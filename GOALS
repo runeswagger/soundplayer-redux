@@ -8,7 +8,7 @@ Development Goals:
 			-modules must place their data in a struct fmtname_data, even if it has only one member
 			-it should return 0 on success
 			-it should return a standardized negative value to signify a specific ERROR
-		*_play(struct sp* env)
+		*_encode(struct sp* env)
 			-this function is expected to handle all values of env->size
 			-it's not required to NULL check input currently but perhaps it should
 			-this function should return the number of bytes used from the input on success
@@ -19,5 +19,14 @@ Development Goals:
 		*_deinit(struct sp* env)
 			-this function destroys all non-automatic assests of the codec if possible
 			-it is expected to operate without serious error and return 0
+		*(sp_module_t *env)
+			-is the dispatcher function for the module
+		*_auto(sp_module_t *env)
+			-chaining works, but the module always sends SPOP_DECODE this limits the flexibility
+				of the soundplayer api, I wanted to avoid relying on a struct member to determin
+				the requested operation since it might have a residual/uninitialized value that
+				is inappropriate for the task at hand. I'm going to do both for compatibility
+				_auto() is the function that handles checking the modules state and mode members
+				to effectively chain the output.
 		struct fmtname_data{}
 			-this should be allocated on the heap during initialization not declared as static

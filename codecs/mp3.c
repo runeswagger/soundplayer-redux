@@ -24,7 +24,7 @@ void interleave(short* pcml, short* pcmr, short* stereo){
 	}
 }
 
-int mp3_init(struct sp* env){
+int mp3_init(sp_module_t *env){
 	struct mp3_data *data = malloc(sizeof(struct mp3_data));
 
 	data->lame = lame_init();
@@ -38,7 +38,7 @@ int mp3_init(struct sp* env){
 	return SP_OK;
 }
 
-int mp3_decode(struct sp* env){
+int mp3_decode(sp_module_t *env){
 	struct mp3_data *data = env->data;
 	
 	//making buffers
@@ -51,15 +51,12 @@ int mp3_decode(struct sp* env){
 		status = hip_decode1(data->l, (unsigned char*)(env->input + env->size - bytes_in_buffer), bytes_in_buffer, pcml, pcmr);
 		bytes_in_buffer = 0; //we consumed a buffer... yay
 		interleave(pcml, pcmr, data->b);
-		//callback.audio_play((char*)data->b, status*4);
-		env->next->input = data->b;
-		env->next->size = status*4;
-		env->next->dispatcher(env->next, SPOP_DECODE);
+		sp_data_in(env->next, data->b, status*4);
 	} while (status == MP3_FRAME_SIZE);
 	return env->size; //decode function always consumes the full input
 }
 
-int mp3_deinit(struct sp* env){
+int mp3_deinit(sp_module_t *env){
 	//clean up mp3 decoder
 	struct mp3_data *data = env->data;
 	hip_decode_exit(data->l); //exit hip decoder instance l
@@ -70,8 +67,10 @@ int mp3_deinit(struct sp* env){
 	return SP_OK;
 }
 
-int mp3(struct sp* env, enum sp_ops operation){
+int mp3(sp_module_t *env, sp_operation_t operation){
 	switch(operation){
+		case SPOP_AUTO:
+			return mp3_decode(env); //TODO: write mp3_auto();
 		case SPOP_DECODE:
 			return mp3_decode(env);
 		case SPOP_INIT:

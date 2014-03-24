@@ -17,11 +17,7 @@ struct ogg_data {
 	long cursor;
 };
 
-struct cb callback;
-
 void mcpy(void* dest, void* src, size_t n){
-	//mysterious segfault in __memcpy_sse2_unaligned
-	//to hell with __memcpy_sse2_unaligned
 	char* there = (char*) dest;
 	char* here = (char*) src;
 	while(n--) { //this ought to do it
@@ -35,8 +31,8 @@ size_t ogg_read_callback(void *ptr, size_t size, size_t nmemb, void* datasource)
 	//WAIT... fread never modifies ptr... I've been doing it wrong this whole time
 
 	//retrieve our data 
-	struct sp * env = datasource;
-	struct ogg_data * data = env->private_data;
+	sp_module_t * env = datasource;
+	struct ogg_data * data = env->data;
 
 	int requested = size * nmemb; //number of bytes the user wants
 	int available = env->size - data->cursor; //bytes left in buffer
@@ -59,9 +55,9 @@ size_t ogg_read_callback(void *ptr, size_t size, size_t nmemb, void* datasource)
 	return 0;
 }
 
-int ogg_init(struct sp* env){
+int ogg_init(sp_module_t* env){
 	struct ogg_data *data = calloc(sizeof(struct ogg_data),1);
-	env->private_data = data; //forgot this, wondered why everything went bonkers
+	env->data = data; //forgot this, wondered why everything went bonkers
 	data->handlers.read_func = ogg_read_callback;
 	data->handlers.seek_func = NULL;
 	data->handlers.close_func = NULL;
@@ -85,16 +81,16 @@ int ogg_init(struct sp* env){
 	return 0;
 }
 
-int ogg_play(struct sp* env){
+int ogg_decode(sp_module_t* env){
 	char buffer[256];
-	struct ogg_data *data = env->private_data;
+	struct ogg_data *data = env->data;
 	int bytes_in_buffer = env->size;
 	int samples;
 	data->cursor = 0;
 	while(bytes_in_buffer){
 		samples = ov_read(&data->vf, buffer, 256, 0, 2, 1, &data->current_section);
 		if(samples > 0) { //no error occured
-			callback.audio_play(buffer, samples);
+			sp_data_in(env->next, buffer, samples);
 		}
 		if(samples == 0) break;
 	}
@@ -104,7 +100,23 @@ int ogg_play(struct sp* env){
 	return env->size;
 }
 
-int ogg_deinit(struct sp* env){
-	ov_clear(&((struct ogg_data*)env->private_data)->vf);
+int ogg_deinit(sp_module_t *env){
+	ov_clear(&((struct ogg_data*)env->data)->vf);
 	return 0;
+}
+
+int ogg(sp_module_t *env, sp_operation_t operation){
+	switch(operation){
+		case SPOP_AUTO:
+			return ogg_decode(env);
+		case SPOP_DECODE:
+			return ogg_decode(env);
+		case SPOP_INIT:
+			return ogg_init(env);
+		case SPOP_DEINIT:
+			return ogg_deinit(env);
+		default:
+			return SP_NOCODE;
+	}
+	return SP_ABORT;
 }

@@ -5,13 +5,13 @@ struct alsa_data {
 	snd_pcm_t* pcm; //the playback handle
 };
 
-int alsa_configure(struct sp * env){
+int alsa_configure(sp_module_t *env){
 	struct alsa_data* data = (struct alsa_data*) env->data;
 	snd_pcm_set_params(data->pcm, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, /*env->p.chan, env->p.rate,*/2,44100, 1, 500000);
 	return SP_OK;
 }
 
-int alsa_init(struct sp* env){
+int alsa_init(sp_module_t *env){
 	//initialize alsa
 	struct alsa_data* data = malloc(sizeof(struct alsa_data));
 	void* arg = env->data;
@@ -34,10 +34,10 @@ int alsa_init(struct sp* env){
 	return SP_OK;
 }
 
-int alsa_decode(struct sp* env){
+int alsa_decode(sp_module_t *env){
 	//play a buffer through alsa
 
-	//adapting for struct sp
+	//adapting for sp_module_t
 	char* in = env->input;
 	long size = env->size;
 	struct alsa_data* data = (struct alsa_data*) env->data;
@@ -52,7 +52,7 @@ int alsa_decode(struct sp* env){
 	return SP_OK;
 }
 
-int alsa_deinit(struct sp* env){
+int alsa_deinit(sp_module_t *env){
 	//kill alsa
 	struct alsa_data* data = (struct alsa_data*) env->data;
 	snd_pcm_drain(data->pcm);
@@ -61,8 +61,10 @@ int alsa_deinit(struct sp* env){
 	return SP_OK;
 }
 
-int alsa(struct sp* env, enum sp_ops operation){
+int alsa(sp_module_t *env, sp_operation_t operation){
 	switch(operation){
+		case SPOP_AUTO:
+			return alsa_decode(env); //TODO: write alsa_auto();
 		case SPOP_DECODE:
 			return alsa_decode(env);
 		case SPOP_DEINIT:

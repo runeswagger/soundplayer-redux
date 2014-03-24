@@ -18,7 +18,7 @@
 void detect_filetype_from_filename(char* filename);
 int arg_parse(int, char**);
 int err();
-enum sp_type fmt;
+sp_type_t fmt;
 
 void progress(long cur, long end){
 	printf("%li/%li\r",cur,end);
@@ -28,8 +28,8 @@ void progress(long cur, long end){
 int main(int argc, char **argv) {
 	if(argc < 2) return -1;
 
-	struct sp callback = { .dispatcher = alsa, .data = "default" }; //we have an alsa callback
-	struct sp soundp = { .next = &callback }; //create the link
+	sp_module_t callback = { .dispatcher = alsa, .data = "default" }; //we have an alsa callback
+	sp_module_t soundp = { .next = &callback }; //create the link
 
 	arg_parse(argc, argv);
 
@@ -52,11 +52,11 @@ int main(int argc, char **argv) {
 	soundp.input = mmap(NULL, ((fileinfo.st_size/4096+1)*4096), PROT_READ, MAP_PRIVATE, fd, 0 );
 	soundp.size = fileinfo.st_size;
 
-	int (*handlers[LEN_MODULES])(struct sp *arg, enum sp_ops operation) = {
+	int (*handlers[LEN_MODULES])(sp_module_t *arg, sp_operation_t operation) = {
 		[WAV] = wav,
 		//[AAC] = {aac_init,aac_play,aac_deinit},
 		[MP3] = mp3,
-		//[OGG] = {ogg_init,ogg_play,ogg_deinit},
+		[OGG] = ogg,
 		//[FLAC] = {err,err,err},
 		//[SPC] = {spc_init,spc_play_sp,spc_deinit},
 		//[TXT] = {tts_init,tts_play,tts_deinit},

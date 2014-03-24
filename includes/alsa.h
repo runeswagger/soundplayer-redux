@@ -1,10 +1,10 @@
 #ifndef H_OUTPUT_ALSA
 #define H_OUTPUT_ALSA
 
-int alsa(struct sp* env, enum sp_ops operation);
-int alsa_configure(struct sp* env);
-int alsa_init(struct sp* env);
-int alsa_decode(struct sp* env);
-int alsa_deinit(struct sp* env);
+int alsa_configure(sp_module_t *env);
+int alsa_init(sp_module_t *env);
+int alsa_decode(sp_module_t *env);
+int alsa_deinit(sp_module_t *env);
+int alsa(sp_module_t *env, sp_operation_t operation);
 
 #endif

@@ -1,7 +1,8 @@
 CC = gcc
-CFLAGS = -Wall -Wextra
+#CFLAGS = -Wall -Wextra
+CFLAGS = -W
 TARGET = sp2
-SRC = sp.c
+SRC = sp.c splib.c
 
 #file output for sp2
 #SRC += outputs/output-file.c
@@ -22,8 +23,8 @@ SRC += codecs/mp3.c
 LIBS += -lmp3lame
 
 #ogg decoder
-#SRC += codecs/ogg.c
-#LIBS += -lvorbisfile
+SRC += codecs/ogg.c
+LIBS += -lvorbisfile
 
 #spc decoder
 APUCORE = deps/snes_spc-0.9.0/snes_spc
