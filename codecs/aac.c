@@ -10,9 +10,7 @@ struct aac_data {
 	//typedef suggests this is a pointer... so i probably don't need it to persist
 };
 
-struct cb callback;
-
-int aac_init(struct sp* env){
+int aac_init(sp_module_t *env){
 	//initialize the aac specific structures
 	struct aac_data* data = malloc(sizeof(struct aac_data)); //allocate private structures
 	int buffer_size = FAAD_MIN_STREAMSIZE*8; //formerly used in the decode call
@@ -44,15 +42,15 @@ int aac_init(struct sp* env){
 	(void)buffer_size;
 	(void)cap;
 	
-	env->private_data = data;
+	env->data = data;
 	return SP_OK;
 }
 
-int aac_play(struct sp* env){
-	struct aac_data* data = env->private_data;
+int aac_decode(sp_module_t *env){
+	struct aac_data* data = env->data;
 	char* pcm = NeAACDecDecode(data->hAac, &data->hInfo, (unsigned char*)env->input, env->size);
 	if ((data->hInfo.error == 0) && (data->hInfo.samples > 0)){
-		callback.audio_play(pcm, data->hInfo.samples*2);
+		sp_data_in(env->next, pcm, data->hInfo.samples*2);
 		//output of decoder is 16 bit, because i set it that way in aac_init;
 	}
 	else if (data->hInfo.error != 0) {
@@ -61,10 +59,26 @@ int aac_play(struct sp* env){
 	return data->hInfo.bytesconsumed;
 }
 
-int aac_deinit(struct sp* env){
+int aac_deinit(sp_module_t *env){
 	//deallocate things
-	struct aac_data *data = env->private_data;
+	struct aac_data *data = env->data;
 	NeAACDecClose(data->hAac); //let faad cleanup
 	free(data); //clean up my struct
 	return SP_OK;
+}
+
+int aac(sp_module_t *env, sp_operation_t operation){
+	switch(operation){
+		case SPOP_AUTO:
+			return aac_decode(env);
+		case SPOP_DECODE:
+			return aac_decode(env);
+		case SPOP_INIT:
+			return aac_init(env);
+		case SPOP_DEINIT:
+			return aac_deinit(env);
+		default:
+			return SP_NOCODE;
+	}
+	return SP_ABORT;
 }

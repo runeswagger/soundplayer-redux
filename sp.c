@@ -7,8 +7,8 @@
 #include <unistd.h>
 
 //config header, includes prototypes for various functions
-#include "config.h"
 #include "includes/common.h"
+#include "config.h"
 #include "includes/decoders.h"
 #include "includes/outputs.h"
 
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 
 	int (*handlers[LEN_MODULES])(sp_module_t *arg, sp_operation_t operation) = {
 		[WAV] = wav,
-		//[AAC] = {aac_init,aac_play,aac_deinit},
+		[AAC] = aac,
 		[MP3] = mp3,
 		[OGG] = ogg,
 		//[FLAC] = {err,err,err},

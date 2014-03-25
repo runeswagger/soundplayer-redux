@@ -1,6 +1,6 @@
 CC = gcc
-#CFLAGS = -Wall -Wextra
-CFLAGS = -W
+CFLAGS = -Wall -Wextra
+#CFLAGS = -W
 TARGET = sp2
 SRC = sp.c splib.c
 
@@ -15,8 +15,8 @@ LIBS += -lasound
 SRC += codecs/wav.c
 
 #aac decoder
-#SRC += codecs/aac.c
-#LIBS += -lfaad
+SRC += codecs/aac.c
+LIBS += -lfaad
 
 #mp3 decoder
 SRC += codecs/mp3.c

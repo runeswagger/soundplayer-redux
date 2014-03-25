@@ -1,6 +1,6 @@
 /* Available Decoder Config */
 #define USE_WAV
-//#define USE_AAC
+#define USE_AAC
 #define USE_MP3
 #define USE_OGG
 //#define USE_FLAC
