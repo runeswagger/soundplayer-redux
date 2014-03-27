@@ -5,7 +5,12 @@
 #include "../includes/common.h"
 //include own header file, so that i can freely deinit if init doesn't go so well
 #include "../includes/spc.h"
-struct cb callback;
+#include "../includes/splib.h"
+
+struct spc_data {
+	SNES_SPC* snes_spc;
+	unsigned char* buffer;
+};
 
 int spc_init(struct sp* env){
 	/* Create emulator and filter */
@@ -36,13 +41,12 @@ int spc_play_sp(struct sp* env){
 	//play indefinitely because i don't have a limit built into struct sp
 	while (1){
 		spc_play(snes_spc, 2048, buf);
-		callback.audio_play((char*)buf, 2048*sizeof(short));
+		sp_data_in(env->next, (char*)buf, 2048*sizeof(short));
 	}
 	return SP_OK;
 }
 
 int spc_deinit(struct sp* env){
 	spc_delete((SNES_SPC*) env->private_data);
-	
 	return SP_OK;
 }

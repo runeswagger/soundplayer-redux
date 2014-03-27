@@ -8,6 +8,7 @@
 #include <string.h>
 #include "espeak/speak_lib.h"
 #include "../includes/common.h"
+#include "../includes/splib.h"
 
 struct tts_data {
 	espeak_VOICE voice; //not sure it needs persistance but whatever
@@ -66,13 +67,13 @@ int tts_init(struct sp* env){
 	espeak_SetParameter(espeakWORDGAP, data->wordgap, 0);
 	espeak_SetParameter(espeakPITCH, data->pitch, 0);
 	
-	env->private_data = data; //export module data
+	env->data = data; //export module data
 	return SP_OK;
 }
 
 int tts_play(struct sp* env){
 	//convert text to speech
-	struct tts_data* data = env->private_data;
+	struct tts_data* data = env->data;
 	unsigned int id;
 	espeak_Synth(env->input, env->size, 0, POS_CHARACTER, env->size/*end pos*/, data->flags, &id, data);
 	return env->size;
@@ -81,6 +82,6 @@ int tts_play(struct sp* env){
 int tts_deinit(struct sp* env){
 	//clean up espeak structures
 	espeak_Terminate();
-	free(env->private_data);
+	free(env->data);
 	return SP_OK;
 }

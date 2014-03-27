@@ -1,4 +1,5 @@
 #include "../includes/common.h"
+#include "../includes/splib.h"
 
 struct wav_data {
 	int empty; //empty for now

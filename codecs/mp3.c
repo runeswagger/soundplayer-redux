@@ -1,3 +1,4 @@
+#include "splib.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <lame/lame.h>
