@@ -1,8 +1,8 @@
-#include "splib.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <lame/lame.h>
 #include "../includes/common.h"
+#include "../includes/splib.h"
 
 #define MP3_FRAME_SIZE 1152
 //number of shorts in a frame

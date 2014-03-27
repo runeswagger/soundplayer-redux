@@ -1,5 +1,5 @@
 #include "../includes/common.h"
-#include "splib.h"
+#include "../includes/splib.h"
 #include <stdlib.h>
 #include <unistd.h>
 #include <neaacdec.h>
