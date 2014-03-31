@@ -15,6 +15,7 @@
 //includes for soundplayer
 //you really only need to include the headers for output-alsa and the module
 #include "includes/common.h"
+#include "includes/splib.h"
 #include "includes/decoders.h"
 #include "includes/outputs.h"
 
@@ -62,9 +63,9 @@ int main(int argc, char* argv[]){
 	//it's there so the program can distinguish multiple decoder instances
 	
 	//running our main loop
-	output.dispatcher(&output, SPOP_INIT);
+	sp_module_init(&output);
 
-	if(soundp.dispatcher(&soundp, SPOP_INIT) == SP_ABORT) goto CLEANUP;
+	if(sp_module_init(&soundp) == SP_ABORT) goto CLEANUP;
 	//start seeking the input to an offset if necessary
 	fseek(input, soundp.p.offset, SEEK_SET);
 
@@ -76,10 +77,10 @@ int main(int argc, char* argv[]){
 	} while(soundp.size);
 
 	
-	soundp.dispatcher(&soundp, SPOP_DEINIT);
+	sp_module_deinit(&soundp);
 
 	CLEANUP:
-	output.dispatcher(&output, SPOP_DEINIT);
+	sp_module_deinit(&output);
 
 	return 0;
 }

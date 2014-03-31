@@ -27,9 +27,10 @@ SRC += codecs/ogg.c
 LIBS += -lvorbisfile
 
 #spc decoder
-#APUCORE = deps/snes_spc-0.9.0/snes_spc
-#CFLAGS += -fno-exceptions
-#SRC += $(APUCORE)/*.cpp codecs/spc.c -I $(APUCORE)
+APUCORE = deps/snes_spc-0.9.0/snes_spc
+CFLAGS += -fno-exceptions
+#inline -I
+SRC += -I$(APUCORE) $(APUCORE)/*.cpp codecs/spc.c
 
 #txt file decoder
 #SRC += codecs/tts.c
@@ -41,10 +42,10 @@ RELEASE_FLAGS = -O3
 all: $(TARGET)
 
 $(TARGET):
-	$(CC) $(DEBUG_FLAGS) $(CFLAGS) -o $(TARGET) $(SRC) $(LIBS) $(APUCORE)
+	$(CC) $(DEBUG_FLAGS) $(CFLAGS) -o $(TARGET) $(SRC) $(LIBS)
 
 release:
-	$(CC) $(RELEASE_FLAGS) $(CFLAGS) -o $(TARGET) $(SRC) $(LIBS) $(APUCORE)
+	$(CC) $(RELEASE_FLAGS) $(CFLAGS) -o $(TARGET) $(SRC) $(LIBS)
 
 clean:
 	rm $(TARGET)

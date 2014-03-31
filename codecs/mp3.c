@@ -52,7 +52,7 @@ int mp3_decode(sp_module_t *env){
 		status = hip_decode1(data->l, (unsigned char*)(env->input + env->size - bytes_in_buffer), bytes_in_buffer, pcml, pcmr);
 		bytes_in_buffer = 0; //we consumed a buffer... yay
 		interleave(pcml, pcmr, data->b);
-		sp_data_in(env->next, data->b, status*4);
+		sp_data_in(env->next, (char*)data->b, status*4);
 	} while (status == MP3_FRAME_SIZE);
 	return env->size; //decode function always consumes the full input
 }

@@ -7,7 +7,7 @@ struct alsa_data {
 
 int alsa_configure(sp_module_t *env){
 	struct alsa_data* data = (struct alsa_data*) env->data;
-	snd_pcm_set_params(data->pcm, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, /*env->p.chan, env->p.rate,*/2,44100, 1, 500000);
+	snd_pcm_set_params(data->pcm, SND_PCM_FORMAT_S16_LE, SND_PCM_ACCESS_RW_INTERLEAVED, env->p.chan, env->p.rate, 1, 500000);
 	return SP_OK;
 }
 

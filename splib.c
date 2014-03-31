@@ -22,37 +22,12 @@ inline int sp_data_in(sp_module_t *module, char* buffer, unsigned long len){
 
 sp_module_t* sp_module_new(sp_type_t format){
 	//allocate a module
+	//TODO: set up the dispatcher callback
 	sp_module_t *module = calloc(1, sizeof(sp_module_t));
 	
-	if (module == 0){ return SP_AGAIN; }
+	if (module == NULL){ return NULL; }
+	(void)format;
 	
-	/*switch(format){
-		case WAV:
-			module->dispatcher = wav;
-			break;
-		case AAC:
-			module->dispatcher = aac;
-			break;
-		case MP3:
-			module->dispatcher = mp3;
-			break;
-		case OGG:
-			module->dispatcher = ogg;
-			break;
-		case FLAC:
-			module->dispatcher = flac;
-			break;
-		case SPC:
-			module->dispatcher = spc;
-			break;
-		case TXT:
-			module->dispatcher = tts;
-			break;
-		default:
-			//TODO: dlsym based plugin loading
-			return 0;
-	}*/
-
 	return module;
 }
 

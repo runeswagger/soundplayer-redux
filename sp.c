@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 		[MP3] = mp3,
 		[OGG] = ogg,
 		//[FLAC] = {err,err,err},
-		//[SPC] = {spc_init,spc_play_sp,spc_deinit},
+		[SPC] = spc,
 		//[TXT] = {tts_init,tts_play,tts_deinit},
 		[UNIMPLEMENTED] = err
 	};

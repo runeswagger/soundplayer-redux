@@ -1,8 +1,9 @@
 #ifndef H_SPC
 #define H_SPC
 
-int spc_init(struct sp *env);
-int spc_play_sp(struct sp *env); //unfortunate name clash in blargg snes_spc
-int spc_deinit(struct sp *env);
+int spc_init(sp_module_t *env);
+int spc_decode(sp_module_t *env);
+int spc_deinit(sp_module_t *env);
+int spc(sp_module_t *module, sp_operation_t operation);
 
 #endif

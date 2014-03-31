@@ -4,7 +4,7 @@
 #define USE_MP3
 #define USE_OGG
 //#define USE_FLAC
-//#define USE_SPC
+#define USE_SPC
 //#define USE_TTS
 
 /* Available Output Module Config */

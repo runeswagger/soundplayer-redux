@@ -65,6 +65,7 @@ struct sp_module {
 	sp_type_t format;
 	sp_state_t state;
 	sp_param_t p;
+	int flags; //used with SPOP_AUTO
 	sp_module_t *next;
 	int (*dispatcher)(sp_module_t *env, sp_operation_t operation);
 };
