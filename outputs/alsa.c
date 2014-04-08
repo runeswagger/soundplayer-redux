@@ -28,9 +28,9 @@ int alsa_init(sp_module_t *env){
 
 	data->pcm = pcm;
 	env->data = data;
-	env->p.rate = 44100;
-	env->p.chan = 2;
-	alsa_configure(env);
+	//env->p.rate = 44100;
+	//env->p.chan = 2;
+	//alsa_configure(env);
 	return SP_OK;
 }
 
@@ -59,6 +59,20 @@ int alsa_deinit(sp_module_t *env){
 	snd_pcm_close(data->pcm);
 	free(env->data);
 	return SP_OK;
+}
+
+int alsa_auto(sp_module_t *env){
+	//automatic mode
+	if(1){
+		return alsa_init(env);
+	}
+	if(1){
+		env->p.rate = 44100;
+		env->p.chan = 2;
+		return alsa_configure(env);
+	}
+
+	return alsa_decode(env);
 }
 
 int alsa(sp_module_t *env, sp_operation_t operation){

@@ -8,7 +8,7 @@ Development Goals:
 			-modules must place their data in a struct fmtname_data, even if it has only one member
 			-it should return 0 on success
 			-it should return a standardized negative value to signify a specific ERROR
-		*_encode(struct sp* env)
+		*_decode(struct sp* env)
 			-this function is expected to handle all values of env->size
 			-it's not required to NULL check input currently but perhaps it should
 			-this function should return the number of bytes used from the input on success
@@ -16,10 +16,12 @@ Development Goals:
 			-error return values are iffy at this point, since input may be consumed whether or not
 				an error occurs, an error reporting member of struct sp may be required
 			-standardized negative return values will therefore be the current convention
+		*_encode(struct sp* env)
+			-same restrictions as _decode
 		*_deinit(struct sp* env)
 			-this function destroys all non-automatic assests of the codec if possible
 			-it is expected to operate without serious error and return 0
-		*(sp_module_t *env)
+		*(sp_module_t *module, sp_operation_t operation)
 			-is the dispatcher function for the module
 		*_auto(sp_module_t *env)
 			-chaining works, but the module always sends SPOP_DECODE this limits the flexibility

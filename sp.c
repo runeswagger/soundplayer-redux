@@ -8,9 +8,11 @@
 
 //config header, includes prototypes for various functions
 #include "includes/common.h"
+#include "includes/splib.h"
 #include "config.h"
 #include "includes/decoders.h"
 #include "includes/outputs.h"
+#include "includes/echo.h"
 
 #define BUF_SIZE 4096
 #define NUM_FUNC 3
@@ -20,6 +22,11 @@ int arg_parse(int, char**);
 int err();
 sp_type_t fmt;
 
+//made these global, it's easier to handle commandline options that way
+sp_module_t callback = { .dispatcher = alsa, .data = "default", .p = { .rate = 44100, .chan = 2 } }; //we have an alsa callback
+sp_module_t soundp = { .next = &callback }; //create the link
+sp_module_t filter = { 0 }; //create a filter
+
 void progress(long cur, long end){
 	printf("%li/%li\r",cur,end);
 	fflush(stdout);
@@ -27,9 +34,6 @@ void progress(long cur, long end){
 
 int main(int argc, char **argv) {
 	if(argc < 2) return -1;
-
-	sp_module_t callback = { .dispatcher = alsa, .data = "default" }; //we have an alsa callback
-	sp_module_t soundp = { .next = &callback }; //create the link
 
 	arg_parse(argc, argv);
 
@@ -67,6 +71,7 @@ int main(int argc, char **argv) {
 	int bytes_consumed = 0;
 	{
 		callback.dispatcher(&callback, SPOP_INIT);
+		callback.dispatcher(&callback, SPOP_CONFIGURE);
 
 		if(handlers[soundp.format](&soundp, SPOP_INIT)) goto END;
 		soundp.input += soundp.p.offset; //if struct sp is used uninitialized this could be a problem
@@ -98,18 +103,32 @@ int arg_parse(int argc, char **argv) {
 	fmt = UNIMPLEMENTED; //initialize value
 
 	int parse = 0;
-	while((parse = getopt(argc, argv, "f:o:")) != -1){
+	while((parse = getopt(argc, argv, "f:o:r:p")) != -1){
 		switch(parse){
 			case 'f':
 				fmt = atoi(optarg);
 				break;
 			case 'o':
-				//i don't have an easy way to select outputs yet. not outputs[][]
-			//	callback.audio_init = output_file_init;
-			//	callback.audio_play = output_file_play;
-			//	callback.audio_deinit = output_file_deinit;
-			//	callback.audio_configure = output_file_configure;
+				//set the output module to use file
+			//	callback.dispatcher = file;
+				//set the initializer to optarg
+			//	callback.data = optarg;
 				break;
+			case 'r':
+				//set the output sample rate
+				callback.p.rate = atoi(optarg);
+				break;
+			case 'p':
+				soundp.next = &filter;
+				filter.next = &callback;
+				callback.next = NULL;
+				
+				filter.dispatcher = echo;
+				
+				if(sp_module_init(&filter) == SP_OK){
+				} else {
+					printf("something bad happend!\n");
+				}
 		}
 	}
 

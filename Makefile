@@ -36,6 +36,9 @@ SRC += -I$(APUCORE) $(APUCORE)/*.cpp codecs/spc.c
 #SRC += codecs/tts.c
 #LIBS += -lespeak
 
+#echo filter
+SRC += filters/echo.c
+
 DEBUG_FLAGS = -g3
 RELEASE_FLAGS = -O3
 

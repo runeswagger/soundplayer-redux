@@ -1,3 +1,7 @@
 I include a copy of snes_spc in ./deps to ease compiling
 
 the snes_spc code is Copyright Shay Green (2004-2007) - gblargg@gmail.com
+
+I'm including a copy of libespeak.a that has been compiled for generic 64 bit without portaudio.
+
+espeak is licensed under GPLv3 (http://espeak.sourceforge.net/)

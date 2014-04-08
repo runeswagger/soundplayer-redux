@@ -21,12 +21,15 @@ int output_file_init(void *arg) {
 	return 0;
 }
 
-
-int output_file_play(char *in, long size) {
-	return fwrite(in, 1, size,callback.handle);
+int file_encode(sp_module_t *env){
+	return fread(env->input, 1, env->size, env->data);
 }
 
-int output_file_deinit() {
-	fclose(callback.handle);
+int file_decode(sp_module_t *env) {
+	return fwrite(env->input, 1, env->size, env->data);
+}
+
+int output_file_deinit(sp_module_t *env) {
+	fclose(NULL);
 	return 0;
 }

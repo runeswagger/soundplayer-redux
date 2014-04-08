@@ -34,7 +34,7 @@ int tts_speech_callback(short* wav, int nsamp, espeak_EVENT* events){
 	return 0; // 1 || 0 == continue || abort synthesis
 }
 
-int tts_init(struct sp* env){
+int tts_init(sp_module_t *env){
 	struct tts_data *data = malloc(sizeof(struct tts_data)); //make a struct
 	memset(data, 0, sizeof(struct tts_data)); //initialize to zero
 
@@ -71,7 +71,7 @@ int tts_init(struct sp* env){
 	return SP_OK;
 }
 
-int tts_play(struct sp* env){
+int tts_decode(sp_module_t *env){
 	//convert text to speech
 	struct tts_data* data = env->data;
 	unsigned int id;
@@ -79,9 +79,35 @@ int tts_play(struct sp* env){
 	return env->size;
 }
 
-int tts_deinit(struct sp* env){
+int tts_deinit(sp_module_t *env){
 	//clean up espeak structures
 	espeak_Terminate();
 	free(env->data);
 	return SP_OK;
+}
+
+int tts_auto(sp_module_t *env){
+	if(1) {
+		//init if uninitialized
+		return tts_init(env);
+	}
+
+	return (1) tts_decode(env) : 0;
+}
+
+int tts(sp_module_t module, sp_operation_t operation){
+	switch(operation){
+		case SPOP_AUTO:
+			return tts_auto(module);
+		case SPOP_DECODE:
+		//case SPOP_OUTPUT:
+			return tts_decode(module);
+		case SPOP_INIT:
+			return tts_init(module);
+		case SPOP_DEINIT:
+			return tts_deinit(module);
+		default:
+			return SP_NOCODE;
+	}
+	return SP_ABORT;
 }

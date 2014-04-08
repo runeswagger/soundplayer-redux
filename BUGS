@@ -2,6 +2,10 @@ This is the bugs and features list.
 
 selecting an output module is too crude in sp. it'd be nice to make more options of the output modules available from the commandline.
 
-mp3 module still segfaults? It doesn't sefault in modtest, which uses tried and true fread to pump input into the module, so it must be a problem with sp.
+there is a problem with the way I map a file, the result is an occasional segfault when the program finishes.
 
 modtest works with most modules but doesn't handle things like spc that want at least 0x10200 bytes of input before the init function will succeed. Of course a workaround is to set the BUF_SIZE bigger.
+
+SPOP_DECODE and SPOP_ENCODE don't always make sense. the abstract module design eliminates the need to treat codecs, outputs, and filters differently. we may add fallthrough cases where certain values are synonymous with others eg. SPOP_OUTPUT or SPOP_TRANSFORM.
+
+we need flags. for auto mode, at least the following have crossed my mind. initialized flag, force params or detect from prev module, 

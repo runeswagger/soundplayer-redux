@@ -1,6 +1,6 @@
 int output_oss_configure(int sample_rate, int channels, void* module_data){
 	int a = 16;
-	ioctl(fileno(callback.handle), SOUND_PC_WRITE_BITS, &a);
+	ioctl(fileno(callback.handle), SOUND_PCM_WRITE_BITS, &a);
 	ioctl(fileno(callback.handle), SOUND_PCM_WRITE_CHANNELS, &channels);
 	ioctl(fileno(callback.handle), SOUND_PCM_WRITE_RATE, &sample_rate);
 	return 0;
@@ -19,7 +19,7 @@ int output_oss_init(void *arg){
 
 int output_oss_play(char *in, long size){
 	//play a buffer
-	return output_file_play(in,size)
+	return output_file_play(in,size);
 }
 
 int output_alsa_deinit(){

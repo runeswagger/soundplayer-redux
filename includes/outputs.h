@@ -1,5 +1,5 @@
 #ifdef USE_OUTPUT_FILE
-#include "output-file.h"
+#include "file.h"
 #endif
 
 #ifdef USE_OUTPUT_ALSA
@@ -7,9 +7,9 @@
 #endif
 
 #ifdef USE_OUTPUT_OSS
-#include "output-oss.h"
+#include "oss.h"
 #endif
 
 #ifdef USE_OUTPUT_MEMCPY
-#include "output-memory.h"
+#include "memory.h"
 #endif
