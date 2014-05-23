@@ -1,19 +1,22 @@
-int output_oss_configure(int sample_rate, int channels, void* module_data){
-	int a = 16;
-	ioctl(fileno(callback.handle), SOUND_PCM_WRITE_BITS, &a);
-	ioctl(fileno(callback.handle), SOUND_PCM_WRITE_CHANNELS, &channels);
-	ioctl(fileno(callback.handle), SOUND_PCM_WRITE_RATE, &sample_rate);
+int oss_configure(sp_module_t *env){
+	int bits = env->p.bits;
+	int channels = env->p.chan;
+	int sample_rate = env->p.rate;
+	
+	ioctl(fileno(env->input), SOUND_PCM_WRITE_BITS, &bits);
+	ioctl(fileno(env->input), SOUND_PCM_WRITE_CHANNELS, &channels);
+	ioctl(fileno(env->input), SOUND_PCM_WRITE_RATE, &sample_rate);
+	
 	return 0;
 }
 
-int output_oss_init(void *arg){
+int output_oss_init(sp_module_t *env){
 	//start up the oss
-	if(arg == NULL){
+	if(env->data == NULL){
 		//default to /dev/dsp
-		arg = (void*)"/dev/dsp";
+		env->data = (void*)"/dev/dsp";
 	}
-	output_file_init(arg);
-	output_oss_configure(44100, 2, NULL);
+	output_file_init(env);
 	return 0;
 }
 
@@ -22,7 +25,19 @@ int output_oss_play(char *in, long size){
 	return output_file_play(in,size);
 }
 
-int output_alsa_deinit(){
+int oss_deinit(sp_module_t *env){
 	//deallocate things
-	return output_file_deinit();
+	return file_deinit(env);
+}
+
+int oss(sp_module_t *module, sp_operation_t operation){
+	switch(operation){
+		case SPOP_AUTO:
+		case SPOP_DECODE:
+		case SPOP_OUTPUT:
+			return oss_output(module);
+		default:
+			return SP_NOCODE;
+	}
+	return SP_ABORT;
 }

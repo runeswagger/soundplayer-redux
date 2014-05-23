@@ -16,7 +16,7 @@ char **module_names = NULL;
 //keep track of the size of module_vector and module_names
 unsigned long nmodules = 0;
 
-int spscript_new_module(char* name){
+int spscript_new_module(const char* name){
 	sp_module_t *module = malloc(sizeof(sp_module_t));
 	//won't allocate space for name...
 	//assuming the pointer passed is not temporary

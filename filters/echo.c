@@ -16,6 +16,19 @@ int echo_configure(sp_module_t *env){
 	return SP_OK;
 }
 
+int echo_auto(sp_module_t *env){
+	//do the auto stuff
+	if(!sp_flag_isset(env, SP_AUTO))
+		//must be in auto mode
+		return SP_ABORT;
+	if(!sp_flag_isset(env, SP_INITIALIZED)){
+		//initialize the module
+		if(sp_module_init(env)){
+			sp_flag_set(env, SP_INITIALIZED);
+		}
+	}
+}
+		
 int echo_init(sp_module_t *env){
 	struct echo_data *data = malloc(sizeof(struct echo_data));
 	//allocate some memory, we can't trust that env->size is sane right now
@@ -32,7 +45,8 @@ int echo_init(sp_module_t *env){
 int echo_decode(sp_module_t *env){
 	//average the previous buffer with this one cumulatively
 	struct echo_data *data = env->data;
-
+	int bytes_consumed = 0; //since filter can only be applied in sample window_increments
+	
 	//adjust buffers as needed
 	//we need to be smart here, at the very least we can't
 	//realloc when env->size is zero, since it will free(data->buffer)
@@ -41,9 +55,9 @@ int echo_decode(sp_module_t *env){
 	}
 	//sample window will eventually be runtime configurable
 	//but for now this statement is ineffective
-	data->previous = realloc(data->previous, data->sample_window);
-	int x,y;
-		
+	//data->previous = realloc(data->previous, data->sample_window);
+	int x;
+	//FIXME: env->size is larger than data->sample_window ...i'm reading bad memory
 	for(x=env->size; x>=0 ; x--) {
 		data->buffer[x] = (data->previous[x]>>1) + (data->buffer[x]>>1);
 		data->previous[x] = data->buffer[x];
