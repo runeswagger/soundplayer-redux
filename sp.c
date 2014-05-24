@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 	fstat(fd, &fileinfo);
 	//map file, and round up to the next page boundary
 	soundp.input = mmap(NULL, ((fileinfo.st_size/4096+1)*4096), PROT_READ, MAP_PRIVATE, fd, 0 );
-	madvise(sp->input_buffer, sp->buffer_size, MADV_SEQUENTIAL|MADV_WILLNEED);
+	madvise(soundp.input, fileinfo.st_size, MADV_SEQUENTIAL|MADV_WILLNEED);
 	soundp.size = fileinfo.st_size;
 
 	int (*handlers[LEN_MODULES])(sp_module_t *arg, sp_operation_t operation) = {

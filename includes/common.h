@@ -1,9 +1,9 @@
 #ifndef H_COMMON
 #define H_COMMON
 
-#define sp_flag_set(module, flags) do { module->flags |= (flags); } while(0);
-#define sp_flag_clr(module, flags) do { module->flags &= ~(flags); } while(0);
-#define sp_flag_isset(module, flags) (module->flags&flags)
+#define sp_flag_set(module, y) do { module->flags |= (y); } while(0);
+#define sp_flag_clr(module, y) do { module->flags &= ~(y); } while(0);
+#define sp_flag_isset(module, y) (module->flags & (y))
 
 //forward definitions for typedefs
 enum sp_type;

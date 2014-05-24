@@ -27,6 +27,8 @@ int echo_auto(sp_module_t *env){
 			sp_flag_set(env, SP_INITIALIZED);
 		}
 	}
+	
+	return SP_OK;
 }
 		
 int echo_init(sp_module_t *env){
